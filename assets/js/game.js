@@ -7,7 +7,7 @@ function Element(){
 		this.element = element;
 		return this;
 	}
-	this.getIt = function(element){
+	this.getQuery = function(element){
 		this.element = document.querySelector(element);
 		return this;
 	}
@@ -125,27 +125,117 @@ class Canvas{
 
 class Game{
 	constructor(backgroundGame, bodyGame, userPopup){
+		var w,h;
+		w = new Element().getQuery(bodyGame).this().width;
+		h = new Element().getQuery(bodyGame).this().height;
 		this.canvas = {
-			back : new Canvas(backgroundGame),
+			width: w,
+			height: h,
 			game : new Canvas(bodyGame),
 			user : new Canvas(userPopup),
-			width: new Element().getId(bodyGame).width,
-			height: new Element().getId(bodyGame).height
+			back : new Canvas(backgroundGame),
+			left: window.innerWidth > w ? (window.innerWidth - w) / 2 : window.innerWidth,
+			top: window.innerHeight > h ? (window.innerHeight - h) / 2 : window.innerHeight
+		}
+
+		this.mouse = {
+			globalx : 0,
+			globaly : 0,
+			canvasX : 0,
+			canvasY : 0,
+			canvasClickedX: 0,
+			canvasClickedY: 0,
+			globalClickedX: 0,
+			globalClickedY: 0
 		}
 
 		this.game = {
+			level : 1
+		}
+		this.bullet = {
+			width : 10,
+			height : 10,
+			x : 0,
+			y : 0
+		}
+		this.player = {
+			width : 20,
+			height : 20,
+			x : 100,
+			y : 10,
 			bullet : 30,
 			life  : 5,
 			specialBullet : 10
 		}
+
+		this.image = {
+			player : "assets/images/player1.png",
+			bullet : "assets/images/bullet.png"
+		}
 	}
+
+	setUpEnvironment(){
+		new Element().getQuery("body").css("background-color:black;");
+		var css = {
+			"position" : "absolute",
+			"top" : this.canvas.top + "px",
+			"left": this.canvas.left + "px",
+			"z-index": 0
+		}
+		var back = new Element().getElement(this.canvas.back.getElement()).css(css).this();
+		var user = new Element().getElement(this.canvas.user.getElement()).css(css).this();
+		var game = new Element().getElement(this.canvas.game.getElement()).css(css).this();
+		user.style.zIndex = back.style.zIndex = 0;
+		game.style.zIndex = 1;
+
+		this.canvas.back.drawRect([0,0], [this.canvas.width, this.canvas.height],"#323232");
+
+		this.allListenerToMousePosition();
+
+		return this;
+	}
+	createPlayer(self){
+		var image = new Image();
+		image.src = this.image.player
+		image.onload = function(){
+			self.canvas.game.clear([self.player.x,self.player.y],[self.player.width,self.player.height])
+			self.canvas.game.drawImage(this,[self.player.x,self.player.y],[self.player.width,self.player.height])
+		}
+	}
+	 
+	gameLoop(){
+		var self = this;
+		setInterval(function(){
+			//self.playerMove();
+		},1);
+	}
+
+	allListenerToMousePosition(){
+		var self = this;
+		this.canvas.game.getElement().addEventListener("click", function(event){
+			self.mouse.globalClickedX = event.clientX;
+			self.mouse.globalClickedY = event.clientY;
+			self.mouse.canvasClickedX = event.clientX - self.canvas.left;
+			self.mouse.canvasClickedY = event.clientY - self.canvas.top;
+		});
+
+		this.canvas.game.getElement().addEventListener("mousemove", function(event){
+			self.mouse.globalX = event.clientX;
+			self.mouse.globalY = event.clientY;
+			self.mouse.canvasX = event.clientX - self.canvas.left;
+			self.mouse.canvasY = event.clientY - self.canvas.top;
+			self.createPlayer(self);
+		});
+	}
+
+
 	test(){
-		return this.canvas.width
+		return [this.canvas.height,this.canvas.width,this.canvas.left,this.canvas.top]
 	}
 }
 
+new Game("#gameBack","#gameFront","#gamePopup").setUpEnvironment()
 
 
 
-
-alert(new Game("#gameBack","#gameFront","#gamePopup").test())
+/*mokled ar modzraobs player gamossawoebelia */
