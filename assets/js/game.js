@@ -155,7 +155,7 @@ class Game{
 			height : 40,
 			x : this.canvas.width / 2,
 			y : this.canvas.height - 50,
-			bullet : 130,
+			bullet : 530,
 			life  : 100,
 			specialBullet : 10,
 			direction : {
@@ -177,7 +177,8 @@ class Game{
 		this.enemy = {
 			width : 20,
 			height : 20,
-			damage : 80 // percentage of 100
+			damage : 50, // percentage of 100
+			power : 1
 		}
 		this.image = {
 			player : "assets/images/player5.gif",
@@ -191,6 +192,14 @@ class Game{
 			flyBack1 : new Audio("assets/sounds/flysound1.mp3"),
 			mute : false
 		}
+		this.enemyInterval = 100 // 100 is ok.. and decrising for fastering
+		this.enemyShootRandom = 1000 // 1000 is ok and decrising for fastering
+
+		this.score = 0
+
+		this.bonus = 10000
+
+		this.counter = 0
 	}
 
 	setUpEnvironment(){
@@ -261,31 +270,38 @@ class Game{
 			})
 	}
 	createEnemy(self){
-		for(var i = self.canvas.width / 10; i < self.canvas.width; i += self.canvas.width  / 10){
-			self.enemys.push({
-				x : i,
-				y : 20,
-				power : 2,
-				moving : false,
-				direction : {
-					left : true,
-					top : true 
+		
+			for(var j = 20; j < 240; j +=80){
+				for(var i = self.canvas.width / 10; i < self.canvas.width; i += self.canvas.width  / 20){
+					self.enemys.push({
+						x : i,
+						y : j,
+						power : self.enemy.power,
+						moving : true,
+						direction : {
+							left : true,
+							top : true 
+						}
+					})
 				}
-			})
-		}
+			}
+		 
 	}
 
 
 	drawEnemys(self){
-		var image = new Image();
-		image.src = this.image.enemy
-		image.onload = function(){
-			for(var i = 0; i < self.enemys.length; i ++){
-				self.canvas.game.clear([self.enemys[i].x,self.enemys[i].y],[self.enemy.width,self.enemy.height])
-				// self.canvas.game.drawImage(this,[self.enemys[i].x,self.enemys[i].y],[self.enemy.width,self.enemy.height])
-				self.canvas.game.drawRect([self.enemys[i].x,self.enemys[i].y],[self.enemy.width,self.enemy.height])
-			}
-		}
+		// var image = new Image();
+		// image.src = this.image.enemy
+		// image.onload = function(){
+		
+				for(var i = 0; i < self.enemys.length; i ++){
+					// self.canvas.game.clear([self.enemys[i].x,self.enemys[i].y],[self.enemy.width,self.enemy.height])
+					// self.canvas.game.drawImage(this,[self.enemys[i].x,self.enemys[i].y],[self.enemy.width,self.enemy.height])
+					self.canvas.game.drawRect([self.enemys[i].x,self.enemys[i].y],[self.enemy.width,self.enemy.height])
+				// }
+				}
+
+
 	}
 
 	createPlayer(self){
@@ -435,6 +451,8 @@ class Game{
 						 }else{
 						 	self.enemys[i].power --
 						 }
+						self.score += 20 * self.enemy.power
+
 					 }
 				 }
 			}
@@ -455,6 +473,7 @@ class Game{
 					self.player.life -= new Operations().getRandom(self.enemy.damage / 2, self.enemy.damage)
 					self.canvas.game.clear([self.enemyBullets[i].x, self.enemyBullets[i].y], [self.bullet.width, self.bullet.height])
 					self.enemyBullets.splice(i, 1)
+
 				}
 			}
 		}
@@ -476,6 +495,8 @@ class Game{
 						self.bullets.splice(j, 1)
 						self.enemyBullets.splice(i, 1)
 
+						self.score += 10
+
 					}
 				}
 			}	
@@ -484,7 +505,7 @@ class Game{
 
  
 	createEnemyBullet(self){
-		if((new Operations().getRandom(0, 100)) == (new Operations().getRandom(0, 100))){
+		if((new Operations().getRandom(0, self.enemyShootRandom)) == (new Operations().getRandom(0, self.enemyShootRandom))){
 
 			if(self.enemys.length <= 0) return;
 			var enemyIndex = new Operations().getRandom(0, self.enemys.length - 1);
@@ -510,13 +531,42 @@ class Game{
 
 	drawBulletsCount(self){
 		self.canvas.user.clear([0,0], [self.canvas.user.getElement().getAttribute("width"), 30]);
-		self.canvas.user.drawText([10,30], "Bullets : " + self.player.bullet, 30, "red");
+		self.canvas.user.drawText([10,30], "Bullets : " + self.player.bullet, 28, "red");
 	}
 	drawHelthCount(self){
 		self.canvas.user.clear([0,30], [self.canvas.user.getElement().getAttribute("width"), 30]);
-		self.canvas.user.drawText([10,60], "health : " + self.player.life + "%", 30, "green");
+		self.canvas.user.drawText([10,60], "health : " + self.player.life + "%", 28, "green");
+	}
+	enemyLevel(self){
+		self.canvas.user.clear([0,60], [self.canvas.user.getElement().getAttribute("width"), 30]);
+		self.canvas.user.drawText([10,90], "Enemy Level : " + self.enemy.power , 25, "purple");
+	}
+	enemyCount(self){
+		self.canvas.user.clear([0,90], [self.canvas.user.getElement().getAttribute("width"), 30]);
+		self.canvas.user.drawText([10,120], "Enemys : " + self.enemys.length , 25, "red");
 	}
 
+	bulletLevel(self){
+		self.canvas.user.clear([0,120], [self.canvas.user.getElement().getAttribute("width"), 30]);
+		self.canvas.user.drawText([10,150], "Bullet Level : " + self.bullet.speed , 23, "blue");
+	}
+
+	bonusCOunterDown(self){
+		if(self.bonus == 0) return
+		self.bonus --
+		self.canvas.user.clear([0,150], [self.canvas.user.getElement().getAttribute("width"), 30]);
+		self.canvas.user.drawText([10,180], "Bonus : + " + self.bonus , 23, "navy");
+	}
+
+	levelCount(self){
+		self.canvas.user.clear([0,180], [self.canvas.user.getElement().getAttribute("width"), 30]);
+		self.canvas.user.drawText([10,210], "Level : " + self.game.level, 23, "green");
+	}
+
+	scoreCount(self){
+		self.canvas.user.clear([0,210], [self.canvas.user.getElement().getAttribute("width"), 30]);
+		self.canvas.user.drawText([10,240], "SCORE : " + self.score, 23, "black");
+	}
 
 	createLeftPanel(){
 		new Element().getElement(this.canvas.user.getElement()).css({
@@ -534,6 +584,46 @@ class Game{
 		}
 	}
 
+	enemyMoving(self){
+		self.counter ++
+		if(self.counter < self.enemyInterval)return
+		self.counter = 0
+		for(var i =  0; i < self.enemys.length; i ++){
+			if(self.enemys[i].moving == true){
+				if(self.enemys[i].direction.left == true){
+					self.canvas.game.clear([self.enemys[i].x,self.enemys[i].y],[self.enemy.width,self.enemy.height])
+					self.enemys[i].x -= 10	
+					if(self.enemys[i].x <= 20){
+						self.enemys[i].direction.left = false
+						self.enemys[i].y += 40
+					}
+				}else{
+					self.canvas.game.clear([self.enemys[i].x,self.enemys[i].y],[self.enemy.width,self.enemy.height])
+					self.enemys[i].x += 10	
+					if(self.enemys[i].x >= self.canvas.width - 40){
+						self.enemys[i].direction.left = true
+						self.enemys[i].y += 40
+					}
+				}
+
+			}
+		}	
+	}
+	enemyCollidesPlayer(self){
+		for(var i = 0; i < self.enemys.length; i ++){
+				var x1,x2,y1,y2;
+				x1 = self.enemys[i].x - self.enemy.width
+				x2 = self.enemys[i].x + self.enemy.width
+				y1 = self.enemys[i].y - self.enemy.height
+				y2 = self.enemys[i].y + self.enemy.height
+				if(self.player.x >= x1 && self.player.x <= x2){
+					if(self.player.y >= y1 && self.player.y <= y2){
+						self.game.end = true
+					}
+				}
+		}	
+	}
+
 	init(){
 		this.setUpEnvironment()
 		this.createLeftPanel()
@@ -546,15 +636,31 @@ class Game{
 		/*initialise all components*/
 		this.init();
 		var self = this;
+		/*realtime loop */
+		setInterval(function(){
+			// self.enemyMoving(self)
+		},100)
+
+
+
+
+
 		/*main loop for game*/
 		setInterval(function(){
 			if (self.game.end == true) return;
 			if (self.game.paused == true) return;
+			self.enemyMoving(self)
 
 			self.chekHelth(self)
-
+			self.enemyCollidesPlayer(self)
 			self.drawBulletsCount(self)
 			self.drawHelthCount(self)
+			self.enemyLevel(self)
+			self.enemyCount(self)
+			self.bulletLevel(self)
+			self.bonusCOunterDown(self)
+			self.scoreCount(self)
+			self.levelCount(self)
 			/*bulets colision*/
 			self.enemyBulletsAndPlayerBuletsCollision(self)
 			/*es player da emeny*/
@@ -571,9 +677,19 @@ class Game{
 			self.animateBullet(self)
 			self.drawEnemys(self)
 
-					// console.log("left: "+self.player.direction.left+" right: "+self.player.direction.right)
+			if(self.enemys.length == 0){
+				self.score += self.bonus
+				self.game.level ++
+				(self.bullet.speed < 5)? self.bullet.speed++ : self.bullet.speed 
+				self.enemy.power ++
+				self.player.bullet += 200
+				self.bonus = self.game.level * 10000;
+				self.enemyInterval = (self.enemyInterval > 10)?self.enemyInterval - 10 : 10
+				self.enemyShootRandom = (self.enemyShootRandom > 100)?self.enemyShootRandom - 100 : 100
+				self.createEnemy(self)
+			}
 
-		},1);
+		},5);
 	}
 
 	 
