@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+<canvas id="canvas" width="1000" height="500"></canvas>
+<script type="text/javascript">
+	
+class Canvas{
+	constructor(querySelector){
+		this.canvas = document.querySelector(querySelector);
+		this.ctx = this.canvas.getContext("2d");
+	}
+	drawLine(A, B, Fill = false, closePath = false){ // A[x,y]  B[x,y] 
+		/*drawLine([0,0],[[20,40],[60,70]]) or drawLine([0,0],[60,70])*/
+		this.ctx.beginPath(); // not testit but hope no error :D
+		this.ctx.moveTo(A[0], A[1]);
+		if(Array.isArray(B[0])){
+			for(var i = 0; i < B.length; i ++){
+				this.ctx.lineTo(B[i][0], B[i][1]);
+			}
+		}else{
+			this.ctx.lineTo(B[0], B[1]);
+		}
+		if(closePath == true)
+			this.ctx.closePath();
+		this.ctx.stroke();
+		if(Fill == true)
+			this.ctx.fill();
+		return this;
+	}
+	drawImage(img, A, WH){
+		this.ctx.drawImage(img,A[0],A[1],WH[0],WH[1]);
+		return this;
+	}
+	cropImage(img,sx,sy,swidth,sheight,x,y,width,height){
+		this.ctx.drawImage(img,sx,sy,swidth,sheight,x,y,width,height)
+		return this
+	}
+	drawCircle(A, R){ //A[x,y] R=len
+		this.ctx.arc(A[0], A[1], R, 0, 2*Math.PI);
+		this.ctx.stroke();
+		return this;
+	}
+	drawText(A, text, fontSize = 12, color = "black"){
+		this.ctx.fillStyle = color;
+		this.ctx.font = fontSize + "px dgt";
+  		this.ctx.fillText(text, A[0], A[1]);
+  		return this;
+	}
+	drawRect(A, WH, color){
+		this.ctx.fillStyle = color?color:"black";
+		this.ctx.fillRect(A[0], A[1], WH[0], WH[1]);
+		return this;
+	}
+	strokeRect(A, WH){
+		this.ctx.strokeRect(A[0], A[1], WH[0], WH[1]);
+		return this;
+	}
+	clear(A, WH){
+		this.ctx.clearRect(A[0], A[1], WH[0], WH[1]);
+		return this;
+	}
+	getElement(){
+		return this.canvas;
+	}
+}
+
+
+
+var image = new Image()
+image.src = "assets/images/image.png"
+image.onload = function(){
+	new Canvas("#canvas").cropImage(this,740,0,25,40,30,30,200,270)
+}
+
+</script>
+</body>
+</html>

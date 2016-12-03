@@ -88,6 +88,10 @@ class Canvas{
 		this.ctx.drawImage(img,A[0],A[1],WH[0],WH[1]);
 		return this;
 	}
+	cropImage(img,sx,sy,swidth,sheight,x,y,width,height){
+		this.ctx.drawImage(img,sx,sy,swidth,sheight,x,y,width,height)
+		return this
+	}
 	drawCircle(A, R){ //A[x,y] R=len
 		this.ctx.arc(A[0], A[1], R, 0, 2*Math.PI);
 		this.ctx.stroke();
@@ -149,6 +153,7 @@ class Game{
 		this.bullets = [];
 		this.enemyBullets = [];
 		this.enemys = [];
+		this.deadObjs = [];
 
 		this.player = {
 			width : 40,
@@ -180,11 +185,32 @@ class Game{
 			damage : 50, // percentage of 100
 			power : 1
 		}
-		this.image = {
-			player : "assets/images/player5.gif",
-			bullet : "assets/images/bullet.png",
-			enemy : "assets/images/fly.png"
+		// this.enemyPower = ["black","purple","yellow","white","green","red","silver","pink"]
+		this.enemyPower = ["enemypower1.png","enemypower2.png","enemypower3.png","enemypower4.png","enemypower5.png","enemypower6.png"]
+
+		this.pixels = {
+			player : [0,0,200,170],
+			playerLow : [0,200,200,165],
+			enemy1 : [300,0,100,80],
+			enemy2 : [400,0,100,80],
+			enemy3 : [500,0,100,80],
+			enemy4 : [300,85,100,80],
+			enemy5 : [400,85,100,80],
+			enemy6 : [500,85,100,80],
+			enemyDown : [[600,0,100,85],[600,85,100,85]],
+			bulletPlayer : [710,0,20,40],
+			bulletEnemy : [770,0,20,40],
+			collision : [740,0,25,40]
 		}
+		this.image = {
+			image : "assets/images/imagenoback.png",
+			player : "assets/images/playernoback.png",
+			bullet : "assets/images/bullet.png",
+			enemy : "assets/images/myenemynoback.png"
+		}
+
+		this.myImage = new Image()
+		this.myImage.src = this.image.image
 		this.sounds = {
 			explode : new Audio("assets/sounds/explode.mp3"),
 			shot : new Audio("assets/sounds/shot.mp3"),
@@ -193,7 +219,7 @@ class Game{
 			mute : false
 		}
 		this.enemyInterval = 100 // 100 is ok.. and decrising for fastering
-		this.enemyShootRandom = 1000 // 1000 is ok and decrising for fastering
+		this.enemyShootRandom = 800 // 1000 is ok and decrising for fastering
 
 		this.score = 0
 
@@ -288,30 +314,139 @@ class Game{
 		 
 	}
 
+	drawObjSpecficPoint(self, A, width = 20, color="black"){
+		self.canvas.game.drawRect([A[0], A[1]],[width, width], color)
+	}
+
 
 	drawEnemys(self){
-		// var image = new Image();
-		// image.src = this.image.enemy
-		// image.onload = function(){
-		
-				for(var i = 0; i < self.enemys.length; i ++){
-					// self.canvas.game.clear([self.enemys[i].x,self.enemys[i].y],[self.enemy.width,self.enemy.height])
-					// self.canvas.game.drawImage(this,[self.enemys[i].x,self.enemys[i].y],[self.enemy.width,self.enemy.height])
-					self.canvas.game.drawRect([self.enemys[i].x,self.enemys[i].y],[self.enemy.width,self.enemy.height])
-				// }
+		/*var image = new Image();
+		image.src = this.image.enemy
+		image.onload = function(){
+*/		
+			for(var i = 0; i < self.enemys.length; i ++){
+				// var imageXY = self.enemyPower[self.enemys[i].power] || self.enemyPower[self.enemyPower.length - 1] 
+				var a,b,c,d;
+				switch(self.enemys[i].power){
+					case 1: 
+							a = self.pixels.enemy1[0]
+							b = self.pixels.enemy1[1]
+							c = self.pixels.enemy1[2]
+							d = self.pixels.enemy1[3]
+						break
+					case 2: 
+							a = self.pixels.enemy2[0]
+							b = self.pixels.enemy2[1]
+							c = self.pixels.enemy2[2]
+							d = self.pixels.enemy2[3]
+						break
+					case 3: 
+							a = self.pixels.enemy3[0]
+							b = self.pixels.enemy3[1]
+							c = self.pixels.enemy3[2]
+							d = self.pixels.enemy3[3]
+						break
+					case 4: 
+							a = self.pixels.enemy4[0]
+							b = self.pixels.enemy4[1]
+							c = self.pixels.enemy4[2]
+							d = self.pixels.enemy4[3]
+						break
+					case 5: 
+							a = self.pixels.enemy5[0]
+							b = self.pixels.enemy5[1]
+							c = self.pixels.enemy5[2]
+							d = self.pixels.enemy5[3]
+						break
+					case 6: 
+							a = self.pixels.enemy6[0]
+							b = self.pixels.enemy6[1]
+							c = self.pixels.enemy6[2]
+							d = self.pixels.enemy6[3]
+						break
+					default: 
+							a = self.pixels.enemy6[0]
+							b = self.pixels.enemy6[1]
+							c = self.pixels.enemy6[2]
+							d = self.pixels.enemy6[3]
+						break
 				}
+				self.canvas.game.clear([self.enemys[i].x,self.enemys[i].y],[self.enemy.width,self.enemy.height])
+				// img,sx,sy,swidth,sheight,x,y,width,height
+				// var a = self.pixels.enemy1[0]
+				// var b = self.pixels.enemy1[1]
+				// var c = self.pixels.enemy1[2]
+				// var d = self.pixels.enemy1[3]
+				self.canvas.game.cropImage(self.myImage,a,b,c,d,self.enemys[i].x,self.enemys[i].y,self.enemy.width,self.enemy.height)
+				// var color = self.enemyPower[self.enemys[i].power] || "pink"
+				// self.canvas.game.drawRect([self.enemys[i].x,self.enemys[i].y],[self.enemy.width,self.enemy.height],color)
+				// self.canvas.game.drawImage(this,[self.enemys[i].x,self.enemys[i].y],[self.enemy.width,self.enemy.height])
+			}
+		// }
 
 
 	}
+ 
+
+	createDeadObj(self, A, enemy = true, width = 20, color = "red", timer = 500){
+		self.deadObjs.push({
+			x : A[0],
+			y : A[1],
+			w : width,
+			c : color,
+			t : timer,
+			e : enemy
+		})
+	}
+
+	drawDeadObjs(self){
+		for(var i = 0; i < self.deadObjs.length; i ++){
+			if(self.deadObjs[i].t == 0){
+				self.canvas.game.clear([self.deadObjs[i].x, self.deadObjs[i].y],[self.deadObjs[i].w, self.deadObjs[i].w])
+				self.deadObjs.splice(i, 1)
+				return
+			}else{
+				self.deadObjs[i].t --
+				if(self.deadObjs[i].e == true){
+					var rnd = new Operations().getRandom(0,1)
+					var a = self.pixels.enemyDown[rnd][0]
+					var b = self.pixels.enemyDown[rnd][1]
+					var c = self.pixels.enemyDown[rnd][2]
+					var d = self.pixels.enemyDown[rnd][3]
+				}else{
+					var a = self.pixels.collision[0]
+					var b = self.pixels.collision[1]
+					var c = self.pixels.collision[2]
+					var d = self.pixels.collision[3]
+				}
+
+				self.canvas.game.cropImage(self.myImage,a,b,c,d,self.deadObjs[i].x, self.deadObjs[i].y,self.deadObjs[i].w, self.deadObjs[i].w)
+				// self.canvas.game.drawRect([self.deadObjs[i].x, self.deadObjs[i].y],[self.deadObjs[i].w, self.deadObjs[i].w],self.deadObjs[i].c)
+			}
+		}
+	}
 
 	createPlayer(self){
-		var image = new Image();
-		image.src = this.image.player
-		image.onload = function(){
+		// var image = new Image();
+		// image.src = this.image.player
+		// image.onload = function(){
 			self.canvas.game.clear([self.player.x-2,self.player.y],[self.player.width+4,self.player.height])
 			// self.canvas.game.drawImage(this,[self.player.x,self.player.y],[self.player.width,self.player.height])
-			self.canvas.game.drawRect([self.player.x,self.player.y],[self.player.width,self.player.height])
-		}
+			var a,b,c,d;
+			if(self.player.life < 50){
+				a = self.pixels.playerLow[0]
+				b = self.pixels.playerLow[1]
+				c = self.pixels.playerLow[2]
+				d = self.pixels.playerLow[3]
+			}else{
+				a = self.pixels.player[0]
+				b = self.pixels.player[1]
+				c = self.pixels.player[2]
+				d = self.pixels.player[3]
+			}
+			self.canvas.game.cropImage(self.myImage,a,b,c,d,self.player.x,self.player.y,self.player.width,self.player.height)
+			// self.canvas.game.drawRect([self.player.x,self.player.y],[self.player.width,self.player.height])
+		// }
 		if(self.player.direction.left == true){
 			self.player.x >= 0?self.player.x -- : self.player.x;
 		}
@@ -322,7 +457,7 @@ class Game{
 	}
 
 	shotSound(self){
-		if(self.sounds.mute ==true) return
+		if(self.sounds.mute == true) return
 		self.sounds.shot.currentTime = 0;
 		self.sounds.shot.play();
 	}
@@ -373,13 +508,16 @@ class Game{
 				self.canvas.game.clear([self.bullets[i].x, self.bullets[i].y], [self.bullet.width, self.bullet.height])
 				self.bullets.splice(i, 1);
 			}else{
-				var image = new Image();
-				image.src = this.image.bullet
+				var a,b,c,d;
+				a = self.pixels.bulletPlayer[0]
+				b = self.pixels.bulletPlayer[1]
+				c = self.pixels.bulletPlayer[2]
+				d = self.pixels.bulletPlayer[3]
 				// image.onload = function(){
 					self.canvas.game.clear([self.bullets[i].x, self.bullets[i].y], [self.bullet.width, self.bullet.height])
 					self.bullets[i].y -= self.bullet.speed;
 					// self.canvas.game.drawImage(image, [self.bullets[i].x, self.bullets[i].y], [self.bullet.width, self.bullet.height])
-					self.canvas.game.drawRect([self.bullets[i].x, self.bullets[i].y], [self.bullet.width, self.bullet.height])
+					self.canvas.game.cropImage(self.myImage, a,b,c,d,self.bullets[i].x, self.bullets[i].y, self.bullet.width, self.bullet.height)
 				// }
 			}
 		}
@@ -447,6 +585,10 @@ class Game{
 
 					 	if(self.enemys[i].power == 1){
 							self.canvas.game.clear([self.enemys[i].x, self.enemys[i].y], [self.enemy.width, self.enemy.height])
+
+							self.createDeadObj(self, [self.enemys[i].x, self.enemys[i].y])
+
+							// self.drawObjSpecficPoint(self, [self.enemys[i].x, self.enemys[i].y], self.enemy.width, "red")
 						 	self.enemys.splice(i, 1)
 						 }else{
 						 	self.enemys[i].power --
@@ -472,6 +614,11 @@ class Game{
 				if(self.enemyBullets[i].y >= y1 && self.enemyBullets[i].y <= y2){
 					self.player.life -= new Operations().getRandom(self.enemy.damage / 2, self.enemy.damage)
 					self.canvas.game.clear([self.enemyBullets[i].x, self.enemyBullets[i].y], [self.bullet.width, self.bullet.height])
+
+					self.createDeadObj(self, [self.enemyBullets[i].x, self.enemyBullets[i].y])
+
+					// self.drawObjSpecficPoint(self, [self.enemyBullets[i].x, self.enemyBullets[i].y],self.bullet.width, "yellow")
+					
 					self.enemyBullets.splice(i, 1)
 
 				}
@@ -492,6 +639,10 @@ class Game{
 					if(self.bullets[j].y >= y1 && self.bullets[j].y <= y2){
 						self.canvas.game.clear([self.bullets[j].x,self.bullets[j].y],[self.bullet.width,self.bullet.height])
 						self.canvas.game.clear([self.enemyBullets[i].x,self.enemyBullets[i].y],[self.bullet.width,self.bullet.height])
+
+						self.createDeadObj(self, [self.enemyBullets[i].x,self.enemyBullets[i].y],false, 10)
+
+						// self.drawObjSpecficPoint(self, [self.enemyBullets[i].x,self.enemyBullets[i].y], self.bullet.width, "green")
 						self.bullets.splice(j, 1)
 						self.enemyBullets.splice(i, 1)
 
@@ -521,7 +672,12 @@ class Game{
 		for (var i = 0; i < self.enemyBullets.length; i ++) {
 			self.canvas.game.clear([self.enemyBullets[i].x, self.enemyBullets[i].y], [self.bullet.width, self.bullet.height])
 			self.enemyBullets[i].y += self.bullet.speed;
-			self.canvas.game.drawRect([self.enemyBullets[i].x, self.enemyBullets[i].y], [self.bullet.width, self.bullet.height],"red")
+			// self.canvas.game.drawRect([self.enemyBullets[i].x, self.enemyBullets[i].y], [self.bullet.width, self.bullet.height],"red")
+				var a = self.pixels.bulletEnemy[0]
+				var b = self.pixels.bulletEnemy[1]
+				var c = self.pixels.bulletEnemy[2]
+				var d = self.pixels.bulletEnemy[3]
+			self.canvas.game.cropImage(self.myImage,a,b,c,d,self.enemyBullets[i].x, self.enemyBullets[i].y, self.bullet.width, self.bullet.height)
 			if(self.enemyBullets[i].y >= self.canvas.height){
 				self.canvas.game.clear([self.enemyBullets[i].x, self.enemyBullets[i].y], [self.bullet.width, self.bullet.height])
 				self.enemyBullets.splice(i, 1)
@@ -586,21 +742,21 @@ class Game{
 
 	enemyMoving(self){
 		self.counter ++
-		if(self.counter < self.enemyInterval)return
+		if(self.counter < self.enemyInterval) return
 		self.counter = 0
 		for(var i =  0; i < self.enemys.length; i ++){
 			if(self.enemys[i].moving == true){
 				if(self.enemys[i].direction.left == true){
 					self.canvas.game.clear([self.enemys[i].x,self.enemys[i].y],[self.enemy.width,self.enemy.height])
 					self.enemys[i].x -= 10	
-					if(self.enemys[i].x <= 20){
+					if(self.enemys[i].x <= 10){
 						self.enemys[i].direction.left = false
 						self.enemys[i].y += 40
 					}
 				}else{
 					self.canvas.game.clear([self.enemys[i].x,self.enemys[i].y],[self.enemy.width,self.enemy.height])
 					self.enemys[i].x += 10	
-					if(self.enemys[i].x >= self.canvas.width - 40){
+					if(self.enemys[i].x >= self.canvas.width - 30){
 						self.enemys[i].direction.left = true
 						self.enemys[i].y += 40
 					}
@@ -630,11 +786,15 @@ class Game{
 		// this.createPlayer(this)
 		this.addListenerToCanvas()
 		this.createEnemy(this)
+		var self  = this;
+		this.myImage.onload = function(){
+			console.log("image loaded")
+			self.gameLoop();
+		}
 	}
 	gameLoop(){
 
 		/*initialise all components*/
-		this.init();
 		var self = this;
 		/*realtime loop */
 		setInterval(function(){
@@ -650,6 +810,8 @@ class Game{
 			if (self.game.end == true) return;
 			if (self.game.paused == true) return;
 			self.enemyMoving(self)
+
+			self.drawDeadObjs(self)
 
 			self.chekHelth(self)
 			self.enemyCollidesPlayer(self)
@@ -695,7 +857,7 @@ class Game{
 	 
 }
 
-new Game("#gameBack","#gameFront","#gamePopup").gameLoop()
+new Game("#gameBack","#gameFront","#gamePopup").init()
 
 
 
