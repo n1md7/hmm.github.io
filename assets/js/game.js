@@ -1007,7 +1007,7 @@ createNewGame(){
 	new Element().createElement("br","#div")
 	new Element().createElement("br","#div")
 
-	new Element().createElement("span","#div").innerHTML("high socre").css("color:red;font-family:dgt;font-size:30px;")
+	new Element().createElement("span","#div").innerHTML("high score").css("color:red;font-family:dgt;font-size:30px;")
 	new Element().createElement("br","#div")
 	new Element().createElement("br","#div")
 	var score = 0
