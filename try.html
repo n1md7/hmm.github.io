@@ -4,7 +4,7 @@
 	<title></title>
 </head>
 <body>
-<canvas id="canvas" width="1000" height="500"></canvas>
+<canvas id="canvas" width="1000" height="500" style="border:solid;"></canvas>
 <script type="text/javascript">
 	
 class Canvas{
@@ -72,7 +72,7 @@ class Canvas{
 var image = new Image()
 image.src = "assets/images/image.png"
 image.onload = function(){
-	new Canvas("#canvas").cropImage(this,740,0,25,40,30,30,200,270)
+	new Canvas("#canvas").cropImage(this,770,0,20,40,0,0,10,20)
 }
 
 </script>

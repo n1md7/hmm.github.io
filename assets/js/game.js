@@ -160,7 +160,7 @@ class Game{
 			height : 40,
 			x : this.canvas.width / 2,
 			y : this.canvas.height - 50,
-			bullet : 530,
+			bullet : 400,
 			life  : 100,
 			specialBullet : 10,
 			direction : {
@@ -174,7 +174,7 @@ class Game{
 			triple : false,
 			maxPerShot : 6, // max 6
 			speed : 1, //max 5
-			width : 10,
+			width : 5,
 			height : 10,
 			x : 0,
 			y : this.player.y-30
@@ -198,9 +198,9 @@ class Game{
 			enemy5 : [400,85,100,80],
 			enemy6 : [500,85,100,80],
 			enemyDown : [[600,0,100,85],[600,85,100,85]],
-			bulletPlayer : [710,0,20,40],
+			bulletPlayer : [714,5,15,40],
 			bulletEnemy : [770,0,20,40],
-			collision : [740,0,25,40]
+			collision : [735,5,30,40]
 		}
 		this.image = {
 			image : "assets/images/imagenoback.png",
@@ -214,9 +214,11 @@ class Game{
 		this.sounds = {
 			explode : new Audio("assets/sounds/explode.mp3"),
 			shot : new Audio("assets/sounds/shot.mp3"),
-			flyBack : new Audio("assets/sounds/flysound.mp3"),
-			flyBack1 : new Audio("assets/sounds/flysound1.mp3"),
-			mute : false
+			back : new Audio("assets/sounds/tier.mp3"),
+			// back1 : new Audio("assets/sounds/flysound1.mp3"),
+			mute : false,
+			laser : new Audio("assets/sounds/laser.mp3"),
+			gotbull : new Audio("assets/sounds/got.mp3")
 		}
 		this.enemyInterval = 100 // 100 is ok.. and decrising for fastering
 		this.enemyShootRandom = 800 // 1000 is ok and decrising for fastering
@@ -246,6 +248,7 @@ class Game{
 		this.createFireForplayer();
 		this.test();
 	}
+
 	createFireForplayer(){
 		this.smoke = new Element().createElement("img","body").css({
 			"position" : "absolute",
@@ -262,7 +265,7 @@ class Game{
 
 	test(){
 		var self = this;
-			new Element().createElement("button","body").innerHTML("double").this().addEventListener("click", function(){
+			/*new Element().createElement("button","body").innerHTML("double").this().addEventListener("click", function(){
 				self.bullet.double = true;
 				self.bullet.triple = false;
 			})
@@ -273,27 +276,8 @@ class Game{
 			new Element().createElement("button","body").innerHTML("one").this().addEventListener("click", function(){
 				self.bullet.double = false;
 				self.bullet.triple = false;
-			})
-			new Element().createElement("button","body").innerHTML("mute").css("font-family:dgt;").this().addEventListener("click", function(){
-				if(self.sounds.mute == true){
-					self.sounds.mute = false
-					this.innerHTML = "mute"
-				} 
-				else{
-					self.sounds.mute = true
-					this.innerHTML = "unmute"
-				}
-			})
-			new Element().createElement("button","body").innerHTML("pause").css("font-family:dgt;").this().addEventListener("click", function(){
-				if(self.game.paused == true){
-					self.game.paused = false
-					this.innerHTML = "pause"
-				} 
-				else{
-					self.game.paused = true
-					this.innerHTML = "resume"
-				}
-			})
+			})*/
+			
 	}
 	createEnemy(self){
 		
@@ -388,21 +372,22 @@ class Game{
 	}
  
 
-	createDeadObj(self, A, enemy = true, width = 20, color = "red", timer = 500){
+	createDeadObj(self, A, enemy = true, width = 20, height = 20, color = "red", timer = 500){
 		self.deadObjs.push({
 			x : A[0],
 			y : A[1],
 			w : width,
 			c : color,
 			t : timer,
-			e : enemy
+			e : enemy,
+			h : height
 		})
 	}
 
 	drawDeadObjs(self){
 		for(var i = 0; i < self.deadObjs.length; i ++){
 			if(self.deadObjs[i].t == 0){
-				self.canvas.game.clear([self.deadObjs[i].x, self.deadObjs[i].y],[self.deadObjs[i].w, self.deadObjs[i].w])
+				self.canvas.game.clear([self.deadObjs[i].x, self.deadObjs[i].y],[self.deadObjs[i].w, self.deadObjs[i].h])
 				self.deadObjs.splice(i, 1)
 				return
 			}else{
@@ -458,8 +443,20 @@ class Game{
 
 	shotSound(self){
 		if(self.sounds.mute == true) return
-		self.sounds.shot.currentTime = 0;
+		self.sounds.shot.currentTime = 0
+		self.sounds.shot.volume = 0.8
 		self.sounds.shot.play();
+	}
+	enemyShotSOund(self){
+		if(self.sounds.mute == true) return
+		self.sounds.laser.currentTime = 0
+		self.sounds.laser.play();
+	}
+
+	gotBullet(self){
+		if(self.sounds.mute == true) return
+		self.sounds.gotbull.currentTime = 0
+		self.sounds.gotbull.play();
 	}
 
 	createBullet(self){
@@ -538,6 +535,26 @@ class Game{
 					// self.player.shooting = true;
 					self.createBullet(self)
 					break;
+				case 80:
+					self.game.paused = self.game.paused == true? false: true
+					document.getElementById("pause").innerHTML = self.game.paused == true? "resume (p)":  "pausee (p)"
+				break 
+				case 77:
+					self.sounds.mute = self.sounds.mute == true? false: true
+					document.getElementById("mute").innerHTML = self.sounds.mute == true? "unmute (m)":  "mute (m)"
+				break 
+				case 49:
+					self.bullet.double = false
+					self.bullet.triple = false
+				break 
+				case 50:
+					self.bullet.double = true
+					self.bullet.triple = false
+				break 
+				case 51:
+					self.bullet.double = false
+					self.bullet.triple = true
+				break 
 			}
 		});
 		document.addEventListener("keyup", function(event){
@@ -552,22 +569,34 @@ class Game{
 		});
 	}
 
+	explosionSound(self){
+		if(self.sounds.mute == true) return
+		self.sounds.explode.currentTime = 0
+		self.sounds.explode.volume = 0.7
+		self.sounds.explode.play()
+
+	}
+
 	backgroundSound(self){
-		if(self.sounds.mute == true){
-			self.sounds.flyBack.pause()
-			self.sounds.flyBack1.pause()
+		/*if(self.sounds.mute == true){
+			self.sounds.back.pause()
 			return;
 		}
-		self.sounds.flyBack.play()
-		self.sounds.flyBack1.play()
-		self.sounds.flyBack.volume = 0.1
-		self.sounds.flyBack1.volume = 0.2
-		if(self.sounds.flyBack.currentTime > 2.2){
-			self.sounds.flyBack.currentTime = 0.2
+		if(self.sounds.paused == true){
+			// self.sounds.back.currentTime = 11.2
+
+			self.sounds.back.stop()
+			return;
+		}*/
+	/*	self.sounds.back.play()
+		self.sounds.back.volume = 0.2
+		if(self.sounds.back.currentTime >= 31.2){
+			self.sounds.back.currentTime = 11.2
 		}
-		if(self.sounds.flyBack1.currentTime > 3){
-			self.sounds.flyBack1.currentTime = 0
-		}
+		if(self.sounds.back.currentTime < 10){
+			self.sounds.back.currentTime = 11.2
+		}*/
+		 
 	}
 
 	detectCollision(self){
@@ -587,10 +616,11 @@ class Game{
 							self.canvas.game.clear([self.enemys[i].x, self.enemys[i].y], [self.enemy.width, self.enemy.height])
 
 							self.createDeadObj(self, [self.enemys[i].x, self.enemys[i].y])
-
+							self.explosionSound(self)
 							// self.drawObjSpecficPoint(self, [self.enemys[i].x, self.enemys[i].y], self.enemy.width, "red")
 						 	self.enemys.splice(i, 1)
 						 }else{
+						 	self.gotBullet(self)
 						 	self.enemys[i].power --
 						 }
 						self.score += 20 * self.enemy.power
@@ -614,7 +644,7 @@ class Game{
 				if(self.enemyBullets[i].y >= y1 && self.enemyBullets[i].y <= y2){
 					self.player.life -= new Operations().getRandom(self.enemy.damage / 2, self.enemy.damage)
 					self.canvas.game.clear([self.enemyBullets[i].x, self.enemyBullets[i].y], [self.bullet.width, self.bullet.height])
-
+					self.gotBullet(self)
 					self.createDeadObj(self, [self.enemyBullets[i].x, self.enemyBullets[i].y])
 
 					// self.drawObjSpecficPoint(self, [self.enemyBullets[i].x, self.enemyBullets[i].y],self.bullet.width, "yellow")
@@ -639,8 +669,8 @@ class Game{
 					if(self.bullets[j].y >= y1 && self.bullets[j].y <= y2){
 						self.canvas.game.clear([self.bullets[j].x,self.bullets[j].y],[self.bullet.width,self.bullet.height])
 						self.canvas.game.clear([self.enemyBullets[i].x,self.enemyBullets[i].y],[self.bullet.width,self.bullet.height])
-
-						self.createDeadObj(self, [self.enemyBullets[i].x,self.enemyBullets[i].y],false, 10)
+						self.gotBullet(self)
+						self.createDeadObj(self, [self.enemyBullets[i].x,self.enemyBullets[i].y],false, 10, 50)
 
 						// self.drawObjSpecficPoint(self, [self.enemyBullets[i].x,self.enemyBullets[i].y], self.bullet.width, "green")
 						self.bullets.splice(j, 1)
@@ -664,7 +694,9 @@ class Game{
 					x : self.enemys[enemyIndex].x,
 					y : self.enemys[enemyIndex].y + self.enemy.height
 				})
+			self.enemyShotSOund(self) 
 		}
+
 		self.drawEnemyBullets(self)
 	}
 
@@ -711,7 +743,7 @@ class Game{
 		if(self.bonus == 0) return
 		self.bonus --
 		self.canvas.user.clear([0,150], [self.canvas.user.getElement().getAttribute("width"), 30]);
-		self.canvas.user.drawText([10,180], "Bonus : + " + self.bonus , 23, "navy");
+		self.canvas.user.drawText([10,180], "Bonus + : " + self.bonus , 23, "navy");
 	}
 
 	levelCount(self){
@@ -728,8 +760,7 @@ class Game{
 		new Element().getElement(this.canvas.user.getElement()).css({
 			"position":"absolute",
 			"top": this.canvas.top + "px",
-			"right": "20px",
-			"border":"solid 1px green",
+			"left": this.canvas.left + this.canvas.width + "px",
 			"background-color":"silver"
 		}).attr("width",200).attr("height",this.canvas.height)
 	}
@@ -789,25 +820,41 @@ class Game{
 		var self  = this;
 		this.myImage.onload = function(){
 			console.log("image loaded")
-			self.gameLoop();
+			self.sounds.back.oncanplaythrough = function(){
+				console.log("back loaded")
+			}
+				self.gameLoop();
+
 		}
+		this.createNewGame()
+
+
+
 	}
 	gameLoop(){
 
 		/*initialise all components*/
 		var self = this;
 		/*realtime loop */
-		setInterval(function(){
+//		setInterval(function(){
 			// self.enemyMoving(self)
-		},100)
+//		},100)
+			// self.game.end = true
 
-
+		// setTimeout(function(){
+		// 	// self.game.end = false
+		// },1000)
 
 
 
 		/*main loop for game*/
 		setInterval(function(){
-			if (self.game.end == true) return;
+			if (self.game.end == true){
+					document.getElementById("over").style.display = "block"
+					document.getElementById("over1").style.display = "block"
+					document.getElementById("scrio").innerHTML = "score : " + self.score
+				return;	
+			} 
 			if (self.game.paused == true) return;
 			self.enemyMoving(self)
 
@@ -839,23 +886,297 @@ class Game{
 			self.animateBullet(self)
 			self.drawEnemys(self)
 
+
+			if(self.score > localStorage.getItem("score")){
+				 localStorage.setItem("score",self.score)
+			}
+
+
 			if(self.enemys.length == 0){
 				self.score += self.bonus
 				self.game.level ++
 				(self.bullet.speed < 5)? self.bullet.speed++ : self.bullet.speed 
 				self.enemy.power ++
-				self.player.bullet += 200
+				self.player.bullet += self.enemy.power * 54 //54 is enemy quantity
 				self.bonus = self.game.level * 10000;
 				self.enemyInterval = (self.enemyInterval > 10)?self.enemyInterval - 10 : 10
 				self.enemyShootRandom = (self.enemyShootRandom > 100)?self.enemyShootRandom - 100 : 100
 				self.createEnemy(self)
+				self.game.paused = true
+					document.getElementById("next").style.display = "block"
+					document.getElementById("next1").style.display = "block"
+					document.getElementById("scr").innerHTML = self.score
+
 			}
 
 		},5);
 	}
 
 	 
+createNewGame(){
+	new Element().createElement("a","body").innerHTML("NEW GAME").attr("href","javascript:location.reload()").css({
+		"position":"absolute",
+		"top": this.canvas.top - 60 + "px",
+		"left": ((this.canvas.left + this.canvas.width) / 2 ) + 80 +"px",
+		"font-size":"20px",
+		"font-family":"dgt"
+	})
+
+ 
+
+
+	new Element().createElement("div",'body').css({
+		"position":"absolute",
+		"width":"200px",
+		"text-align":"center",
+		"height":this.canvas.height + "px",
+		"background-color":"silver",
+		"top":this.canvas.top + "px",
+		"left":this.canvas.left - 200 + "px"
+	}).attr("id","div").this()
+
+	var self = this
+	new Element().createElement("br","#div")
+	new Element().createElement("span","#div").innerHTML("Change Bullet Type").css("color:purple;font-size:20px;")
+	new Element().createElement("br","#div")
+	new Element().createElement("br","#div")
+	new Element().createElement("span","#div").innerHTML("single (1)").css("color:blue;cursor:pointer;")
+	.attr("onmouseover","this.style.fontWeight='bold'")
+	.attr("onmouseout","this.style.fontWeight='normal'").this().onclick = function(){
+		self.bullet.double = false
+		self.bullet.triple = false
+	};
+	new Element().createElement("br","#div")
+	new Element().createElement("br","#div")
+	new Element().createElement("span","#div").innerHTML("double (2)").css("color:gree;cursor:pointer;")
+	.attr("onmouseover","this.style.fontWeight='bold'")
+	.attr("onmouseout","this.style.fontWeight='normal'").this().onclick = function(){
+		self.bullet.double = true
+		self.bullet.triple = false
+	};
+	new Element().createElement("br","#div")
+	new Element().createElement("br","#div")
+	new Element().createElement("span","#div").innerHTML("triple (3)").css("color:red;cursor:pointer;")
+	.attr("onmouseover","this.style.fontWeight='bold'")
+	.attr("onmouseout","this.style.fontWeight='normal'").this().onclick = function(){
+		self.bullet.double = false
+		self.bullet.triple = true
+	};
+	new Element().createElement("br","#div")
+	new Element().createElement("br","#div")
+
+	new Element().createElement("span","#div").innerHTML("Game controls").css("color:navy;font-size:20px;")
+	new Element().createElement("br","#div")
+	new Element().createElement("br","#div")
+	
+	new Element().createElement("span","#div").innerHTML("mute (m)").css("font-family:dgt;cursor:pointer;")
+	.attr("id","mute")
+	.attr("onmouseover","this.style.fontWeight='bold'")
+	.attr("onmouseout","this.style.fontWeight='normal'")
+	.this().addEventListener("click", function(){
+				if(self.sounds.mute == true){
+					self.sounds.mute = false
+					this.innerHTML = "mute (m)"
+				} 
+				else{
+					self.sounds.mute = true
+					this.innerHTML = "unmute (m)"
+				}
+			})
+
+	new Element().createElement("br","#div")
+	new Element().createElement("br","#div")
+
+	new Element().createElement("span","#div").innerHTML("pause (p)").css("font-family:dgt;cursor:pointer;")
+	.attr("id","pause")
+	.attr("onmouseover","this.style.fontWeight='bold'")
+	.attr("onmouseout","this.style.fontWeight='normal'")
+	.this().addEventListener("click", function(){
+		if(self.game.paused == true){
+			self.game.paused = false
+			this.innerHTML = "pause (p)"
+		} 
+		else{
+			self.game.paused = true
+			this.innerHTML = "resume (p)"
+		}
+	})
+
+	new Element().createElement("br","#div")
+
+	new Element().createElement("br","#div")
+	new Element().createElement("br","#div")
+
+	new Element().createElement("span","#div").innerHTML("high socre").css("color:red;font-family:dgt;font-size:30px;")
+	new Element().createElement("br","#div")
+	new Element().createElement("br","#div")
+	var score = 0
+	if(localStorage.getItem("score")){
+		score = localStorage.getItem("score")
+	}
+	new Element().createElement("span","#div").innerHTML(score).css("color:red;font-family:dgt;font-size:30px;").attr("id","score")
+
+
+
+
+
+
+
+
+
+	new Element().createElement("div","body").css({
+		"position":"absolute",
+		"width":"100%",
+		"height":"100%",
+		"background-color":"black",
+		"opacity":"0.9",
+		"top":0,
+		"left":0,
+		"z-index":"10",
+		"display":"none"
+	}).attr("id","next")
+
+	new Element().createElement("div","body").css({
+		"width":"400px",
+		"height":"300px",
+		"background-color":"rgb(34,34,34)",
+		"position":"absolute",
+		"left": (window.innerWidth - 400) /2 + "px",
+		"top":"200px",
+		"z-index":20,
+		"display":"none"
+	}).attr("id","next1")
+
+	new Element().createElement("h3","#next1").innerHTML("Your score").css({
+		"font-family":"dgt",
+		"font-size":"30px",
+		"color":"blue",
+		"border":"nene",
+		"text-align":"center",
+		"background-color":"none"
+	})
+
+	new Element().createElement("h1","#next1").innerHTML(this.score).css({
+		"text-align":"center",
+		"font-family":"dgt",
+		"color":"red"
+	}).attr("id","scr")
+	new Element().createElement("br","#next1")
+	new Element().createElement("br","#next1")
+	new Element().createElement("br","#next1")
+	new Element().createElement("br","#next1")
+	new Element().createElement("br","#next1")
+ 
+	new Element().createElement("h3","#next1").innerHTML("next level").css({
+		"font-family":"dgt",
+		"font-size":"30px",
+		"color":"green",
+		"text-align":"center",
+		"cursor":"pointer"
+	}).this().onclick = function(){
+		document.getElementById("next").style.display = "none"
+		document.getElementById("next1").style.display = "none"
+		self.game.paused = false
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	new Element().createElement("div","body").css({
+		"position":"absolute",
+		"width":"100%",
+		"height":"100%",
+		"background-color":"black",
+		"opacity":"0.9",
+		"top":0,
+		"left":0,
+		"z-index":"10",
+		"display":"none"
+	}).attr("id","over")
+
+	new Element().createElement("div","body").css({
+		"width":"400px",
+		"height":"300px",
+		"background-color":"rgb(34,34,34)",
+		"position":"absolute",
+		"left": (window.innerWidth - 400) /2 + "px",
+		"top":"200px",
+		"z-index":20,
+		"display":"none"
+	}).attr("id","over1")
+
+	new Element().createElement("h3","#over1").innerHTML("Game over").css({
+		"font-family":"dgt",
+		"font-size":"50px",
+		"color":"red",
+		"border":"nene",
+		"text-align":"center",
+		"background-color":"none"
+	})
+	new Element().createElement("br","#over1")
+
+
+	new Element().createElement("h1","#over1").innerHTML("0").css({
+		"text-align":"center",
+		"font-family":"dgt",
+		"color":"blue"
+	}).attr("id","scrio")
+
+
+	new Element().createElement("h1","#over1").innerHTML("new game").css({
+		"text-align":"center",
+		"font-family":"dgt",
+		"color":"green",
+		"cursor":"pointer"
+	}).this().onclick = function(){location.reload()}
+	 
+
+	 
+
+
+
+
 }
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 new Game("#gameBack","#gameFront","#gamePopup").init()
 
