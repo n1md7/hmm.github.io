@@ -221,7 +221,7 @@ class Game{
 			gotbull : new Audio("assets/sounds/got.mp3")
 		}
 		this.enemyInterval = 100 // 100 is ok.. and decrising for fastering
-		this.enemyShootRandom = 800 // 1000 is ok and decrising for fastering
+		this.enemyShootRandom = 300 // 1000 is ok and decrising for fastering
 
 		this.score = 0
 
@@ -280,16 +280,17 @@ class Game{
 			
 	}
 	createEnemy(self){
-		
+		var count = 0
 			for(var j = 20; j < 240; j +=80){
 				for(var i = self.canvas.width / 10; i < self.canvas.width; i += self.canvas.width  / 20){
+					count ++
 					self.enemys.push({
 						x : i,
-						y : j,
+						y : ((count%2==0)? j+40 : j),
 						power : self.enemy.power,
 						moving : true,
 						direction : {
-							left : true,
+							left : ((count%2==0)? true : false),
 							top : true 
 						}
 					})
@@ -372,7 +373,7 @@ class Game{
 	}
  
 
-	createDeadObj(self, A, enemy = true, width = 20, height = 20, color = "red", timer = 500){
+	createDeadObj(self, A, enemy = true, width = 20, height = 20, color = "red", timer = 250){
 		self.deadObjs.push({
 			x : A[0],
 			y : A[1],
@@ -897,11 +898,15 @@ class Game{
 				self.game.level ++
 				(self.bullet.speed < 5)? self.bullet.speed++ : self.bullet.speed 
 				self.enemy.power ++
-				self.player.bullet += self.enemy.power * 54 //54 is enemy quantity
+				self.player.bullet += (self.enemy.power * 54) * 2 //54 is enemy quantity  2 times more bullet then enemy power * quantity
 				self.bonus = self.game.level * 10000;
 				self.enemyInterval = (self.enemyInterval > 10)?self.enemyInterval - 10 : 10
-				self.enemyShootRandom = (self.enemyShootRandom > 100)?self.enemyShootRandom - 100 : 100
+				self.enemyShootRandom = (self.enemyShootRandom > 50)?self.enemyShootRandom - 50 : 50
 				self.createEnemy(self)
+				for(var z=0;z<self.enemyBullets.length;z++){
+					self.createDeadObj(self, [self.enemyBullets[z].x, self.enemyBullets[z].y])
+					self.enemyBullets.splice(z,1)
+				}
 				self.game.paused = true
 					document.getElementById("next").style.display = "block"
 					document.getElementById("next1").style.display = "block"
@@ -940,7 +945,7 @@ createNewGame(){
 	new Element().createElement("span","#div").innerHTML("Change Bullet Type").css("color:purple;font-size:20px;")
 	new Element().createElement("br","#div")
 	new Element().createElement("br","#div")
-	new Element().createElement("span","#div").innerHTML("single (1)").css("color:blue;cursor:pointer;")
+	new Element().createElement("span","#div").innerHTML("single (1)").css("color:blue;font-size:20px;cursor:pointer;")
 	.attr("onmouseover","this.style.fontWeight='bold'")
 	.attr("onmouseout","this.style.fontWeight='normal'").this().onclick = function(){
 		self.bullet.double = false
@@ -948,7 +953,7 @@ createNewGame(){
 	};
 	new Element().createElement("br","#div")
 	new Element().createElement("br","#div")
-	new Element().createElement("span","#div").innerHTML("double (2)").css("color:gree;cursor:pointer;")
+	new Element().createElement("span","#div").innerHTML("double (2)").css("color:gree;font-size:20px;cursor:pointer;")
 	.attr("onmouseover","this.style.fontWeight='bold'")
 	.attr("onmouseout","this.style.fontWeight='normal'").this().onclick = function(){
 		self.bullet.double = true
@@ -956,7 +961,7 @@ createNewGame(){
 	};
 	new Element().createElement("br","#div")
 	new Element().createElement("br","#div")
-	new Element().createElement("span","#div").innerHTML("triple (3)").css("color:red;cursor:pointer;")
+	new Element().createElement("span","#div").innerHTML("triple (3)").css("color:red;font-size:20px;cursor:pointer;")
 	.attr("onmouseover","this.style.fontWeight='bold'")
 	.attr("onmouseout","this.style.fontWeight='normal'").this().onclick = function(){
 		self.bullet.double = false
@@ -969,7 +974,7 @@ createNewGame(){
 	new Element().createElement("br","#div")
 	new Element().createElement("br","#div")
 	
-	new Element().createElement("span","#div").innerHTML("mute (m)").css("font-family:dgt;cursor:pointer;")
+	new Element().createElement("span","#div").innerHTML("mute (m)").css("font-family:dgt;font-size:20px;cursor:pointer;")
 	.attr("id","mute")
 	.attr("onmouseover","this.style.fontWeight='bold'")
 	.attr("onmouseout","this.style.fontWeight='normal'")
@@ -987,7 +992,7 @@ createNewGame(){
 	new Element().createElement("br","#div")
 	new Element().createElement("br","#div")
 
-	new Element().createElement("span","#div").innerHTML("pause (p)").css("font-family:dgt;cursor:pointer;")
+	new Element().createElement("span","#div").innerHTML("pause (p)").css("font-family:dgt;font-size:20px;cursor:pointer;")
 	.attr("id","pause")
 	.attr("onmouseover","this.style.fontWeight='bold'")
 	.attr("onmouseout","this.style.fontWeight='normal'")
