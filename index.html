@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Mosquito Attack</title>
+	<title>Alien Attack</title>
 </head>
 <style type="text/css">
 @font-face{
@@ -18,7 +18,24 @@
 	<canvas id="gamePopup" width="800" height="400"></canvas>
 	<script type="text/javascript" src="assets/js/game.js"></script>
 
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '1817234568566160',
+      xfbml      : true,
+      version    : 'v2.8'
+    });
+  };
 
-	
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "//connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+</script>
+<div class="fb-like" data-share="true" data-width="450" data-show-faces="true">
+</div>
 </body>
 </html>
