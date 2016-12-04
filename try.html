@@ -4,7 +4,7 @@
 	<title></title>
 </head>
 <body>
-<canvas id="canvas" width="1000" height="500" style="border:solid;"></canvas>
+<canvas id="canvas" width="1000" height="500" style="border:solid;position: absolute;left: 20px;top: 20px;"></canvas>
 <script type="text/javascript">
 	
 class Canvas{
@@ -73,6 +73,42 @@ var image = new Image()
 image.src = "assets/images/image.png"
 image.onload = function(){
 	new Canvas("#canvas").cropImage(this,770,0,20,40,0,0,10,20)
+}
+
+function getRandom(min, max){
+		return Math.floor(Math.random()*(max-min+1)+min);
+	}
+
+	var e = document.getElementById("canvas")
+	var initLeft = "20px"
+	var initTop = "20px"
+	e.style.top = "20px"
+	e.style.left = "20px"
+window.onload = function(){
+	myfnk()
+}
+
+
+function myfnk(c = 0){
+	if(c == 10) return
+		c++
+	if(getRandom(0,1) == 1){
+		e.style.left = parseInt(initLeft) + getRandom(5,10) + "px"
+	}else{
+		e.style.left = parseInt(initLeft) - getRandom(5,10) + "px"
+	}
+
+	if(getRandom(0,1) == 1){
+		e.style.top = parseInt(initTop) + getRandom(5,10) + "px"
+	}else{
+		e.style.top = parseInt(initTop) - getRandom(5,10) + "px"
+	}
+
+	setTimeout(function(){
+		e.style.top = initTop
+		e.style.left = initLeft
+		myfnk(c)
+	},30)
 }
 
 </script>
