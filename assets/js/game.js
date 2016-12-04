@@ -169,6 +169,7 @@ class Game{
 			},
 			shooting : false
 		}
+		this.shaking = false		
 		this.bullet = {
 			double : false,
 			triple : false,
@@ -533,29 +534,33 @@ class Game{
 				self.player.direction.left = true;
 				break;
 				case 32: //38 up 
-					// self.player.shooting = true;
-					self.createBullet(self)
-					break;
-					case 80:
-					self.game.paused = self.game.paused == true? false: true
-					document.getElementById("pause").innerHTML = self.game.paused == true? "resume (p)":  "pausee (p)"
-					break 
-					case 77:
-					self.sounds.mute = self.sounds.mute == true? false: true
-					document.getElementById("mute").innerHTML = self.sounds.mute == true? "unmute (m)":  "mute (m)"
-					break 
-					case 49:
-					self.bullet.double = false
-					self.bullet.triple = false
-					break 
-					case 50:
-					self.bullet.double = true
-					self.bullet.triple = false
-					break 
-					case 51:
-					self.bullet.double = false
-					self.bullet.triple = true
-					break 
+				// self.player.shooting = true;
+				self.createBullet(self)
+				break;
+				case 80:
+				self.game.paused = self.game.paused == true? false: true
+				document.getElementById("pause").innerHTML = self.game.paused == true? "resume (p)":  "pause (p)"
+				break 
+				case 77:
+				self.sounds.mute = self.sounds.mute == true? false: true
+				document.getElementById("mute").innerHTML = self.sounds.mute == true? "unmute (m)":  "mute (m)"
+				break 
+				case 49:
+				self.bullet.double = false
+				self.bullet.triple = false
+				break 
+				case 50:
+				self.bullet.double = true
+				self.bullet.triple = false
+				break 
+				case 51:
+				self.bullet.double = false
+				self.bullet.triple = true
+				break 
+				case 83:
+				self.shaking = self.shaking == true? false: true
+				document.getElementById("shaking").innerHTML = self.shaking == true? "shake on (s)":  "shake off (s)"
+				break 
 				}
 			});
 		document.addEventListener("keyup", function(event){
@@ -927,6 +932,7 @@ class Game{
 
 		sheazanzarebliadz(self, top, left, c = 0){
 			if(c == 30) return
+			if(self.shaking == false) return
 					c++
 			if(new Operations().getRandom(0,1) == 1){
 				self.canvas.game.getElement().style.left = parseInt(left) + new Operations().getRandom(0,1) + "px"
@@ -1036,6 +1042,24 @@ class Game{
 			else{
 				self.game.paused = true
 				this.innerHTML = "resume (p)"
+			}
+		})
+
+	new Element().createElement("br","#div")
+		new Element().createElement("br","#div")
+
+		new Element().createElement("span","#div").innerHTML("shake off (s)").css("font-family:dgt;font-size:20px;cursor:pointer;")
+		.attr("id","shaking")
+		.attr("onmouseover","this.style.fontWeight='bold'")
+		.attr("onmouseout","this.style.fontWeight='normal'")
+		.this().addEventListener("click", function(){
+			if(self.shaking == true){
+				self.shaking = false
+				this.innerHTML = "shake off (s)"
+			} 
+			else{
+				self.shaking = true
+				this.innerHTML = "shake on (s)"
 			}
 		})
 
