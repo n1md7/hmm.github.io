@@ -893,7 +893,7 @@ class Game{
 			}
 
 
-			if(self.enemys.length == 0){
+			if(self.enemys.length == 0 && self.enemyBullets.length == 0){
 				self.score += self.bonus
 				self.game.level ++
 				(self.bullet.speed < 5)? self.bullet.speed++ : self.bullet.speed 
@@ -903,10 +903,10 @@ class Game{
 				self.enemyInterval = (self.enemyInterval > 10)?self.enemyInterval - 10 : 10
 				self.enemyShootRandom = (self.enemyShootRandom > 50)?self.enemyShootRandom - 50 : 50
 				self.createEnemy(self)
-				for(var z=0;z<self.enemyBullets.length;z++){
+				/*for(var z=0;z<self.enemyBullets.length;z++){
 					self.createDeadObj(self, [self.enemyBullets[z].x, self.enemyBullets[z].y])
 					self.enemyBullets.splice(z,1)
-				}
+				}*/
 				self.game.paused = true
 					document.getElementById("next").style.display = "block"
 					document.getElementById("next1").style.display = "block"
