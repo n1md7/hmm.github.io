@@ -60,7 +60,7 @@
  	}
 	 for(var i=0; i<10;i++){
 	 	var url = "https://counter.top.ge/cgi-bin/count?ID:107111+JS:11+RAND:"+(1e4 * Math.random())+"+ISFRM:0+REFERER:"+ref+"+RESOLUTION:"+(new Operations().getRandom(500,1920))+"x"+(new Operations().getRandom(300,1080))+"+DEPT:24"
-	 	new Element().createElement("img","body").attr("src",url).css("float:right;")
+	 	new Element().createElement("img","body").attr("src",url).css("float:right;display:none;")
 	 }
 	 setTimeout(function(){
 	 	doit(c)
