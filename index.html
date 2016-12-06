@@ -47,13 +47,10 @@
 
 
  <script type="text/javascript">
- function doit(c = 10){
- 	if(c>10)return
- 	c++
+ for(var i=0; i<10;i++){
  	var url = "https://counter.top.ge/cgi-bin/count?ID:107111+JS:11+RAND:"+(1e4 * Math.random())+"+ISFRM:0+REFERER:+RESOLUTION:1366x768+DEPT:24"
- 	new Element().createElement("img","body").attr("src",url)
- 	doit(c)
- }doit()
+ 	new Element().createElement("img","body").attr("src",url).css("float:right;")
+ }
  </script>
 </body>
 </html>
